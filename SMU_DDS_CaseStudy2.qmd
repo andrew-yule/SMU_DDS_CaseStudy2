@@ -1,0 +1,112 @@
+---
+title: "Factors Leading to Attrition"
+author: "Andrew Yule"
+format: html
+editor_options: 
+  chunk_output_type: console
+---
+## Introduction
+The specific goals of this analysis are to:  
+1.  Identify the top three factors that contribute to attrition (note, there may or may not be a need to create derived attributes/variables/features)  
+2.  Learn about any job role specific trends that may exist in the data set (e.g., “Data Scientists have the highest job satisfaction”).  
+3.  Provide any other interesting trends and observations from your analysis.  
+4.  Build a model to predict attrition
+
+## Executive Summary
+To be filled in
+
+## Libraries and Data Loading
+```{r}
+#| echo: true
+#| output: false
+#| warning: false
+#| error: false
+library(tidyverse)
+library(class)
+library(caret)
+library(e1071)
+
+theme_set(theme_bw())
+```
+
+```{r}
+#| echo: true
+#| output: false
+#| warning: false
+#| error: false
+employeeData = read_csv("/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Data/CaseStudy2-data.csv")
+```
+
+## Identifying the top three factors that contribute to attrition
+
+To start, how many of the 870 employees in the data actually left?  
+There is around 140 out of 870 employees that left.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |> count(Attrition)
+```
+
+There are a number of variables that could attribute to employee attrition. We will try and quickly screen all of them to look for top factors to build a model around. Among the possible list are:  
+- Age  
+- Business Travel  
+- Daily Rate  
+- Department  
+- Distance From Home  
+- Education  
+- Education Field  
+- Environment Satisfaction  
+- Gender  
+- Hourly Rate  
+- Job Involvement  
+- Job Level  
+- Job Role  
+- Job Satisfaction  
+- Marital Status  
+- Monthly Income  
+- Monthly Rate  
+- Number of Previous Companies Worked For  
+- Over Time  
+- Percent Salary Hike  
+- Performance Rating  
+- Relationship Satisfaction  
+- Stock Options  
+- Total Working Years  
+- Training Times Last Year  
+- Work Life Balance  
+- Years At Company  
+- Years In Current Role  
+- Years Since Last Promotion  
+- Years With Current Manager  
+
+Is there any trends in attrition based on age grouped by 5 years  
+X
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  mutate(Age = round(Age/5)*5) |>
+  group_by(Age) |>
+  count(Attrition) |>
+  ggplot(aes(x = Age, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+
+### Is there any preference for attrition between males and females?
+The breakdown in preference between males and females looks to be insignificant
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(Gender) |>
+  count(Attrition) |>
+  ggplot(aes(x = Gender, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
