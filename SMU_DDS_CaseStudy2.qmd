@@ -81,8 +81,8 @@ There are a number of variables that could attribute to employee attrition. We w
 - Years Since Last Promotion  
 - Years With Current Manager  
 
-Is there any trends in attrition based on age grouped by 5 years  
-X
+Is there any trends in attrition based on age grouped by 5 years?  
+Attrition looks to be slightly higher in people around 20 years of age.
 ```{r}
 #| echo: true
 #| output: true
@@ -96,8 +96,107 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
+Is there any trends in attrition based on business travel?  
+There is a slightly higher attrition rate for those traveling frequently, decreasing as travel decreases
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(BusinessTravel) |>
+  count(Attrition) |>
+  ggplot(aes(x = BusinessTravel, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
 
-### Is there any preference for attrition between males and females?
+Is there any trends in attrition based on daily rate grouped by 400 dollars?  
+Attrition looks to be slightly higher around the 400 dollar group, but consistent everywhere else
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = DailyRate)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(DailyRate = round(DailyRate/400)*400) |>
+  group_by(DailyRate) |>
+  count(Attrition) |>
+  ggplot(aes(x = DailyRate, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on department?  
+Nothing significant as far various departments having higher / lower attrition
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(Department) |>
+  count(Attrition) |>
+  ggplot(aes(x = Department, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on distance from home grouped by 5 miles?  
+Attrition looks to be significantly higher for people around 15 miles of distance traveled or higher
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = DistanceFromHome)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(DistanceFromHome = round(DistanceFromHome/5)*5) |>
+  group_by(DistanceFromHome) |>
+  count(Attrition) |>
+  ggplot(aes(x = DistanceFromHome, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on education?  
+Attrition decreases with education level consistently
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(Education) |>
+  count(Attrition) |>
+  ggplot(aes(x = Education, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on education field?  
+Attrition is slightly higher in HR followed by Technical Degree, then marketing
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(EducationField) |>
+  count(Attrition) |>
+  ggplot(aes(x = EducationField, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+
+
+
+
+
+
+Is there any preference for attrition between gender?
 The breakdown in preference between males and females looks to be insignificant
 ```{r}
 #| echo: true
