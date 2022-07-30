@@ -1,5 +1,6 @@
 ---
-title: "Factors Leading to Attrition"
+title: "Predicting Employee Attrition"
+subtitle: "An Analysis of Key Factors Leading to Employee Turnover"
 author: "Andrew Yule"
 format: html
 editor_options: 
@@ -7,9 +8,13 @@ editor_options:
 ---
 ## Introduction
 The specific goals of this analysis are to:  
-1.  Identify the top three factors that contribute to attrition (note, there may or may not be a need to create derived attributes/variables/features)  
+
+1.  Identify the top three factors that contribute to attrition  
+
 2.  Learn about any job role specific trends that may exist in the data set (e.g., “Data Scientists have the highest job satisfaction”).  
+
 3.  Provide any other interesting trends and observations from your analysis.  
+
 4.  Build a model to predict attrition
 
 ## Executive Summary
@@ -34,13 +39,13 @@ theme_set(theme_bw())
 #| output: false
 #| warning: false
 #| error: false
-employeeData = read_csv("/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Data/CaseStudy2-data.csv")
+employeeData = read_csv("https://raw.githubusercontent.com/ayule89/SMU_DDS_CaseStudy2/main/Data/CaseStudy2-data.csv")
 ```
 
 ## Identifying the top three factors that contribute to attrition
 
-To start, how many of the 870 employees in the data actually left?  
-There is around 140 out of 870 employees that left.
+#### How many of the 870 employees in the data actually left?  
+There were 140 out of 870 employees (16%) that left.
 ```{r}
 #| echo: true
 #| output: true
@@ -49,7 +54,9 @@ There is around 140 out of 870 employees that left.
 employeeData |> count(Attrition)
 ```
 
-There are a number of variables that could attribute to employee attrition. We will try and quickly screen all of them to look for top factors to build a model around. Among the possible list are:  
+### Screening all variables to visually investigate which parameters are the highest indicators of attrition  
+There are a number of variables that could attribute to employee attrition. We will first visually screen each of the variables to look for the top 3 factors. The full list of variables includes: 
+
 - Age  
 - Business Travel  
 - Daily Rate  
@@ -81,7 +88,7 @@ There are a number of variables that could attribute to employee attrition. We w
 - Years Since Last Promotion  
 - Years With Current Manager  
 
-Is there any trends in attrition based on age grouped by 5 years?  
+### Attrition based on age  
 Attrition looks to be slightly higher in people around 20 years of age.
 ```{r}
 #| echo: true
@@ -96,8 +103,8 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on business travel?  
-There is a slightly higher attrition rate for those traveling frequently, decreasing as travel decreases
+#### Attrition based on business travel  
+There is an increase in attrition rate as travel increases
 ```{r}
 #| echo: true
 #| output: true
@@ -110,7 +117,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on daily rate grouped by 400 dollars?  
+#### Attrition based on daily rate?  
 Attrition looks to be slightly higher around the 400 dollar group, but consistent everywhere else
 ```{r}
 #| echo: true
@@ -129,7 +136,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on department?  
+#### Attrition based on department?  
 Nothing significant as far various departments having higher / lower attrition
 ```{r}
 #| echo: true
@@ -143,7 +150,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on distance from home grouped by 5 miles?  
+#### Attrition based on commute?  
 Attrition looks to be significantly higher for people around 15 miles of distance traveled or higher
 ```{r}
 #| echo: true
@@ -162,7 +169,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on education?  
+#### Attrition based on education  
 Attrition decreases with education level consistently
 ```{r}
 #| echo: true
@@ -176,7 +183,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on education field?  
+#### Attrition based on education field  
 Attrition is slightly higher in HR followed by Technical Degree, then marketing
 ```{r}
 #| echo: true
@@ -190,7 +197,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on environment satisfaction?  
+#### Attrition based on environment satisfaction  
 Low environment satisfaction has slightly higher attrition, otherwise 2-4 are ~equal
 ```{r}
 #| echo: true
@@ -204,7 +211,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any preference for attrition between gender?  
+#### Attrition based on gender  
 The breakdown in preference between males and females looks to be insignificant
 ```{r}
 #| echo: true
@@ -218,7 +225,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on hourly rate grouped by 20 dollars?  
+#### Attrition based on hourly rate  
 No significant trends in hourly rate and attrition
 ```{r}
 #| echo: true
@@ -237,7 +244,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on job involvement?  
+#### Attrition based on job involvement  
 High correlation with job involvement and attrition
 ```{r}
 #| echo: true
@@ -251,7 +258,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on job level?  
+#### Attrition based on job level  
 1 job level has higher attrition, but other than that no obvious trends
 ```{r}
 #| echo: true
@@ -265,7 +272,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on job role?  
+#### Attrition based on job role  
 Significantly higher attrition in sales representative
 ```{r}
 #| echo: true
@@ -279,7 +286,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on job satisfaction?  
+#### Attrition based on job satisfaction  
 1 job level has higher attrition decreasing as job satisfaction increases
 ```{r}
 #| echo: true
@@ -293,7 +300,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on marital status?  
+#### Attrition based on marital status  
 Higher attrition for single and decreasing for married and further for divorced
 ```{r}
 #| echo: true
@@ -307,7 +314,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on monthly income grouped by 5000 dollars?  
+#### Attrition based on monthly income  
 Highest attrition in less than 5000 monthly income
 ```{r}
 #| echo: true
@@ -326,7 +333,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on monthly rate grouped by 5000 dollars?  
+#### Attrition based on monthly rate  
 Slightly highest around 10000 decreasing lower and higher
 ```{r}
 #| echo: true
@@ -345,7 +352,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on number of previous companies?  
+#### Attrition based on number of previous companies  
 Highest for people who have worked at 5 or more companies, meaning people might have a tendency to change jobs a lot. There's also a slight uptick at low which may indicate individuals that are prone to leave frequently.
 ```{r}
 #| echo: true
@@ -359,7 +366,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on number working over time?  
+#### Attrition based on working over time  
 Highest attrition in people working overtime
 ```{r}
 #| echo: true
@@ -373,7 +380,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on percent salary hike?  
+#### Attrition based on percent salary hike  
 No real obvious trends. Slightly higher around the 22-24% salary increase range
 ```{r}
 #| echo: true
@@ -387,7 +394,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on performance rating?  
+#### Attrition based on performance rating  
 Nothing significant in performance rating
 ```{r}
 #| echo: true
@@ -401,7 +408,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on relationship satisfaction?  
+#### Attrition based on relationship satisfaction  
 Slightly higher in lower relationship satisfaction
 ```{r}
 #| echo: true
@@ -415,7 +422,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on stock option level?  
+#### Attrition based on stock option level  
 Highest among 0 and 3 (lower at 1 and 2)
 ```{r}
 #| echo: true
@@ -429,7 +436,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on total working years rounded to the nearest 5 years?  
+#### Attrition based on total working years  
 Attrition is highest in people during their first 5 years and then levels off. At 40 years people begin retiring.
 ```{r}
 #| echo: true
@@ -448,7 +455,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on training times?  
+#### Attrition based on training times  
 No noticeable patterns
 ```{r}
 #| echo: true
@@ -462,7 +469,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on work life balance?  
+#### Attrition based on work life balance  
 Significant trend in attrition with lower work life balance and decreasing as work life balance improves
 ```{r}
 #| echo: true
@@ -476,7 +483,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on years at company?  
+#### Attrition based on years at company  
 Slightly higher for people in their first 5 years. People over 40 are retiring.
 ```{r}
 #| echo: true
@@ -495,7 +502,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on years at company?  
+#### Attrition based on years at company  
 Slightly higher for people in their first 5 years. People worked over 20 years in the current role show no attrition.
 ```{r}
 #| echo: true
@@ -514,7 +521,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on years since last promotion?  
+#### Attrition based on years since last promotion  
 Slightly higher attrition for people over 15 years since their last promotion but otherwise no trends
 ```{r}
 #| echo: true
@@ -533,7 +540,7 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
-Is there any trends in attrition based on years with current manager?  
+#### Attrition based on years with current manager  
 Longer time spent with current manager the less likely there is for attrition
 ```{r}
 #| echo: true
