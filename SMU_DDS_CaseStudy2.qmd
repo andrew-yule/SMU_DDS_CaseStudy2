@@ -190,13 +190,21 @@ employeeData |>
   geom_col(position = "fill")
 ```
 
+Is there any trends in attrition based on environment satisfaction?  
+Low environment satisfaction has slightly higher attrition, otherwise 2-4 are ~equal
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(EnvironmentSatisfaction) |>
+  count(Attrition) |>
+  ggplot(aes(x = EnvironmentSatisfaction, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
 
-
-
-
-
-
-Is there any preference for attrition between gender?
+Is there any preference for attrition between gender?  
 The breakdown in preference between males and females looks to be insignificant
 ```{r}
 #| echo: true
@@ -207,5 +215,339 @@ employeeData |>
   group_by(Gender) |>
   count(Attrition) |>
   ggplot(aes(x = Gender, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on hourly rate grouped by 20 dollars?  
+No significant trends in hourly rate and attrition
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = HourlyRate)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(HourlyRate = round(DailyRate/200)*200) |>
+  group_by(HourlyRate) |>
+  count(Attrition) |>
+  ggplot(aes(x = HourlyRate, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on job involvement?  
+High correlation with job involvement and attrition
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(JobInvolvement) |>
+  count(Attrition) |>
+  ggplot(aes(x = JobInvolvement, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on job level?  
+1 job level has higher attrition, but other than that no obvious trends
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(JobLevel) |>
+  count(Attrition) |>
+  ggplot(aes(x = JobLevel, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on job role?  
+Significantly higher attrition in sales representative
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(JobRole) |>
+  count(Attrition) |>
+  ggplot(aes(x = JobRole, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on job satisfaction?  
+1 job level has higher attrition decreasing as job satisfaction increases
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(JobSatisfaction) |>
+  count(Attrition) |>
+  ggplot(aes(x = JobSatisfaction, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on marital status?  
+Higher attrition for single and decreasing for married and further for divorced
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(MaritalStatus) |>
+  count(Attrition) |>
+  ggplot(aes(x = MaritalStatus, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on monthly income grouped by 5000 dollars?  
+Highest attrition in less than 5000 monthly income
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = MonthlyIncome)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(MonthlyIncome = round(MonthlyIncome/5000)*5000) |>
+  group_by(MonthlyIncome) |>
+  count(Attrition) |>
+  ggplot(aes(x = MonthlyIncome, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on monthly rate grouped by 5000 dollars?  
+Slightly highest around 10000 decreasing lower and higher
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = MonthlyRate)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(MonthlyRate = round(MonthlyRate/5000)*5000) |>
+  group_by(MonthlyRate) |>
+  count(Attrition) |>
+  ggplot(aes(x = MonthlyRate, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on number of previous companies?  
+Highest for people who have worked at 5 or more companies, meaning people might have a tendency to change jobs a lot. There's also a slight uptick at low which may indicate individuals that are prone to leave frequently.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(NumCompaniesWorked) |>
+  count(Attrition) |>
+  ggplot(aes(x = NumCompaniesWorked, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on number working over time?  
+Highest attrition in people working overtime
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(OverTime) |>
+  count(Attrition) |>
+  ggplot(aes(x = OverTime, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on percent salary hike?  
+No real obvious trends. Slightly higher around the 22-24% salary increase range
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(PercentSalaryHike) |>
+  count(Attrition) |>
+  ggplot(aes(x = PercentSalaryHike, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on performance rating?  
+Nothing significant in performance rating
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(PerformanceRating) |>
+  count(Attrition) |>
+  ggplot(aes(x = PerformanceRating, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on relationship satisfaction?  
+Slightly higher in lower relationship satisfaction
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(RelationshipSatisfaction) |>
+  count(Attrition) |>
+  ggplot(aes(x = RelationshipSatisfaction, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on stock option level?  
+Highest among 0 and 3 (lower at 1 and 2)
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(StockOptionLevel) |>
+  count(Attrition) |>
+  ggplot(aes(x = StockOptionLevel, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on total working years rounded to the nearest 5 years?  
+Attrition is highest in people during their first 5 years and then levels off. At 40 years people begin retiring.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = TotalWorkingYears)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(TotalWorkingYears = round(TotalWorkingYears/5)*5) |>
+  group_by(TotalWorkingYears) |>
+  count(Attrition) |>
+  ggplot(aes(x = TotalWorkingYears, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on training times?  
+No noticeable patterns
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(TrainingTimesLastYear) |>
+  count(Attrition) |>
+  ggplot(aes(x = TrainingTimesLastYear, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on work life balance?  
+Significant trend in attrition with lower work life balance and decreasing as work life balance improves
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  group_by(WorkLifeBalance) |>
+  count(Attrition) |>
+  ggplot(aes(x = WorkLifeBalance, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on years at company?  
+Slightly higher for people in their first 5 years. People over 40 are retiring.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = YearsAtCompany)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(YearsAtCompany = round(YearsAtCompany/5)*5) |>
+  group_by(YearsAtCompany) |>
+  count(Attrition) |>
+  ggplot(aes(x = YearsAtCompany, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on years at company?  
+Slightly higher for people in their first 5 years. People worked over 20 years in the current role show no attrition.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = YearsInCurrentRole)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(YearsInCurrentRole = round(YearsInCurrentRole/5)*5) |>
+  group_by(YearsInCurrentRole) |>
+  count(Attrition) |>
+  ggplot(aes(x = YearsInCurrentRole, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on years since last promotion?  
+Slightly higher attrition for people over 15 years since their last promotion but otherwise no trends
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = YearsSinceLastPromotion)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(YearsSinceLastPromotion = round(YearsSinceLastPromotion/5)*5) |>
+  group_by(YearsSinceLastPromotion) |>
+  count(Attrition) |>
+  ggplot(aes(x = YearsSinceLastPromotion, y = n, fill = Attrition)) +
+  geom_col(position = "fill")
+```
+
+Is there any trends in attrition based on years with current manager?  
+Longer time spent with current manager the less likely there is for attrition
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+employeeData |>
+  ggplot(aes(x = YearsWithCurrManager)) +
+  geom_histogram()
+
+employeeData |>
+  mutate(YearsWithCurrManager = round(YearsWithCurrManager/5)*5) |>
+  group_by(YearsWithCurrManager) |>
+  count(Attrition) |>
+  ggplot(aes(x = YearsWithCurrManager, y = n, fill = Attrition)) +
   geom_col(position = "fill")
 ```
