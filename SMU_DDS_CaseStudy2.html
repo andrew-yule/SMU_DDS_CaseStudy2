@@ -144,11 +144,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(gridExtra)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(class)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(e1071)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(class)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(e1071)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>employeeData <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">"https://raw.githubusercontent.com/ayule89/SMU_DDS_CaseStudy2/main/Data/CaseStudy2-data.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -296,44 +297,114 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
 <span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(colName), <span class="at">y =</span> n, <span class="at">fill =</span> Attrition)) <span class="sc">+</span></span>
 <span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>))</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.55</span>))</span>
 <span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="fu">findAttritionBreakdown</span>(employeeDataWithBuckets, <span class="st">"DistanceFromHome"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> <span class="fu">colnames</span>(employeeData)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) </span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> cols[<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">11</span>, <span class="sc">-</span><span class="dv">23</span>, <span class="sc">-</span><span class="dv">28</span>)]</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">map</span>(cols, <span class="cf">function</span>(col) <span class="fu">findAttritionBreakdown</span>(employeeDataWithBuckets, col))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> plots, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="do">## display plots on one page</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="1152"></p>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> <span class="fu">colnames</span>(employeeData)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> cols[<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">11</span>, <span class="sc">-</span><span class="dv">23</span>, <span class="sc">-</span><span class="dv">28</span>)]</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">map</span>(cols, <span class="cf">function</span>(col) <span class="fu">findAttritionBreakdown</span>(employeeDataWithBuckets, col))</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> plots, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="do">## display plots on one page</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-6-2.png" class="img-fluid" width="1152"></p>
 </div>
-</div>
-</section>
-<section id="top-variables-based-on-visual-screening" class="level3">
-<h3 class="anchored" data-anchor-id="top-variables-based-on-visual-screening">Top variables based on visual screening</h3>
+<p>Based on examining the plots above, the following key variables were identified</p>
 <ul>
-<li>Job involvement</li>
-<li>Environment satisfaction</li>
-<li>Education</li>
-<li>Age</li>
-<li>Commute</li>
-<li>Department</li>
-<li>Job role</li>
-<li>Job satisfaction</li>
-<li>Marital status</li>
-<li>Number of prior companies</li>
-<li>Overtime</li>
-<li>Stock option</li>
-<li>Total working years</li>
-<li>Work life balance</li>
-<li>Years at company</li>
-<li>Years in current role</li>
-<li>Years with current manager</li>
+<li>Age<br>
+</li>
+<li>BusinessTravel<br>
+</li>
+<li>DistanceFromHome<br>
+</li>
+<li>Education<br>
+</li>
+<li>EnvironmentSatisfaction<br>
+</li>
+<li>JobInvolvment<br>
+</li>
+<li>JobRole<br>
+</li>
+<li>JobSatisfaction<br>
+</li>
+<li>MaritalStatus<br>
+</li>
+<li>NumCompaniesWorked<br>
+</li>
+<li>OverTime<br>
+</li>
+<li>StockOptionLevel<br>
+</li>
+<li>TotalWorkingYears<br>
+</li>
+<li>WorkLifeBalance<br>
+</li>
+<li>YearsWithCurrManager</li>
 </ul>
+<p>In order to quantitatively determine the top 3 variables influencing attrition, we’ll build a logistic regression model using the variables above. Before using the results of that regression to determine top variables influencing attrition, we’ll first use cross validation to determine the type of accuracy that can be achieved using logistic regression.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a generalized linear model using a binomial family to perform logistic regression</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">train</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">data =</span> employeeData, <span class="at">method =</span> <span class="st">"glm"</span>, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"LOOCV"</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize the results to determine the possible accuracy</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Generalized Linear Model 
+
+870 samples
+ 15 predictor
+  2 classes: 'No', 'Yes' 
+
+No pre-processing
+Resampling: Leave-One-Out Cross-Validation 
+Summary of sample sizes: 869, 869, 869, 869, 869, 869, ... 
+Resampling results:
+
+  Accuracy   Kappa    
+  0.8850575  0.4852071</code></pre>
+</div>
+</div>
+<p>Using cross validation on our logistic regression, we can achieve an accuracy of over 88% which is high enough to warrant further use of the model to determine key variables influencing attrition.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change Attrition (no/yes) into numerical values to work within the glm function</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>employeeDataForLogisticRegression <span class="ot">=</span> employeeData <span class="sc">|&gt;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Attrition =</span> <span class="fu">ifelse</span>(Attrition <span class="sc">==</span> <span class="st">"No"</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the logistic regression model</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">glm</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> employeeDataForLogisticRegression)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the results of the model fitting along with the broom package which collects model metrics into data frames to quantitatively determine the top parameters</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 17 × 5
+   term                            estimate std.error statistic  p.value
+   &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+ 1 JobRoleResearch Director         -1.95      1.19       -1.63 1.02e- 1
+ 2 OverTimeYes                       1.85      0.240       7.72 1.21e-14
+ 3 JobRoleManufacturing Director    -1.78      0.858      -2.08 3.79e- 2
+ 4 JobRoleSales Representative       1.71      0.581       2.94 3.30e- 3
+ 5 (Intercept)                       1.66      1.11        1.49 1.37e- 1
+ 6 MaritalStatusSingle               1.41      0.472       2.99 2.77e- 3
+ 7 BusinessTravelTravel_Frequently   1.27      0.462       2.75 6.01e- 3
+ 8 JobRoleHuman Resources            1.07      0.713       1.50 1.34e- 1
+ 9 MaritalStatusMarried              0.911     0.390       2.34 1.94e- 2
+10 JobInvolvement                   -0.776     0.160      -4.86 1.19e- 6
+11 BusinessTravelTravel_Rarely       0.539     0.412       1.31 1.92e- 1
+12 WorkLifeBalance                  -0.516     0.158      -3.28 1.05e- 3
+13 JobSatisfaction                  -0.443     0.104      -4.28 1.88e- 5
+14 EnvironmentSatisfaction          -0.250     0.104      -2.40 1.64e- 2
+15 NumCompaniesWorked                0.176     0.0485      3.63 2.85e- 4
+16 DistanceFromHome                  0.0426    0.0139      3.06 2.19e- 3
+17 Age                              -0.0308    0.0174     -1.77 7.66e- 2</code></pre>
+</div>
+</div>
+<p>Based on the results from the logistic regression model, it looks the following variables are the top 3 when determining possible employee attrition:<br>
+1. X</p>
 </section>
 </section>
 

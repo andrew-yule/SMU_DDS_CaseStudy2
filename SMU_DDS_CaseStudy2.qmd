@@ -29,6 +29,7 @@ To be filled in
 #| message: false
 library(tidyverse)
 library(gridExtra)
+library(broom)
 library(class)
 library(caret)
 library(e1071)
@@ -158,9 +159,9 @@ findAttritionBreakdown = function(df, colName) {
     ungroup() |>
     ggplot(aes(x = !!sym(colName), y = n, fill = Attrition)) +
     geom_col(position = "fill") +
-    coord_cartesian(ylim = c(0, 0.5))
+    coord_cartesian(ylim = c(0, 0.55))
 }
-findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")
+#findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")
 
 cols = colnames(employeeData)
 # Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) 
@@ -170,25 +171,62 @@ plots = map(cols, function(col) findAttritionBreakdown(employeeDataWithBuckets, 
 grid.arrange(grobs = plots, ncol = 3) ## display plots on one page
 ```
 
-### Top variables based on visual screening
+Based on examining the plots above, the following key variables were identified
 
--   Job involvement
--   Environment satisfaction
--   Education
--   Age
--   Commute
--   Department
--   Job role
--   Job satisfaction
--   Marital status
--   Number of prior companies
--   Overtime
--   Stock option
--   Total working years
--   Work life balance
--   Years at company
--   Years in current role
--   Years with current manager
+- Age  
+- BusinessTravel  
+- DistanceFromHome  
+- Education  
+- EnvironmentSatisfaction  
+- JobInvolvment  
+- JobRole  
+- JobSatisfaction  
+- MaritalStatus  
+- NumCompaniesWorked  
+- OverTime  
+- StockOptionLevel  
+- TotalWorkingYears  
+- WorkLifeBalance  
+- YearsWithCurrManager  
+
+In order to quantitatively determine the top 3 variables influencing attrition, we'll build a logistic regression model using the variables above. Before using the results of that regression to determine top variables influencing attrition, we'll first use cross validation to determine the type of accuracy that can be achieved using logistic regression.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+
+# Train a generalized linear model using a binomial family to perform logistic regression
+set.seed(1234)
+model = train(Attrition ~ Age + BusinessTravel + DistanceFromHome + DistanceFromHome + Education + EnvironmentSatisfaction + JobInvolvement + JobRole + JobSatisfaction + MaritalStatus + NumCompaniesWorked + OverTime + StockOptionLevel + TotalWorkingYears + WorkLifeBalance + YearsWithCurrManager, data = employeeData, method = "glm", family = "binomial", trControl = trainControl(method = "LOOCV"))
+
+# Summarize the results to determine the possible accuracy
+model
+```
+
+Using cross validation on our logistic regression, we can achieve an accuracy of over 88% which is high enough to warrant further use of the model to determine key variables influencing attrition.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+# Change Attrition (no/yes) into numerical values to work within the glm function
+employeeDataForLogisticRegression = employeeData |>
+  mutate(Attrition = ifelse(Attrition == "No", 0, 1))
+
+# Fit the logistic regression model
+model = glm(Attrition ~ Age + BusinessTravel + DistanceFromHome + DistanceFromHome + Education + EnvironmentSatisfaction + JobInvolvement + JobRole + JobSatisfaction + MaritalStatus + NumCompaniesWorked + OverTime + StockOptionLevel + TotalWorkingYears + WorkLifeBalance + YearsWithCurrManager, family = "binomial", data = employeeDataForLogisticRegression)
+
+# Use the results of the model fitting along with the broom package which collects model metrics into data frames to quantitatively determine the top parameters
+tidy(model) |>
+  filter(p.value < 0.2) |>
+  arrange(desc(abs(estimate)))
+```
+
+Based on the results from the logistic regression model, it looks the following variables are the top 3 when determining possible employee attrition:
 
 
+1. X
 
