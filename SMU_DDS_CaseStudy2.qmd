@@ -26,7 +26,9 @@ To be filled in
 #| output: false
 #| warning: false
 #| error: false
+#| message: false
 library(tidyverse)
+library(gridExtra)
 library(class)
 library(caret)
 library(e1071)
@@ -39,6 +41,7 @@ theme_set(theme_bw())
 #| output: false
 #| warning: false
 #| error: false
+#| message: false
 employeeData = read_csv("https://raw.githubusercontent.com/ayule89/SMU_DDS_CaseStudy2/main/Data/CaseStudy2-data.csv")
 ```
 
@@ -51,11 +54,12 @@ There were 140 out of 870 employees (16%) that left.
 #| output: true
 #| warning: false
 #| error: false
+#| message: false
 employeeData |> count(Attrition)
 ```
 
 ### Screening all variables to visually investigate which parameters are the highest indicators of attrition  
-There are a number of variables that could attribute to employee attrition. We will first visually screen each of the variables to look for the top 3 factors. The full list of variables includes: 
+There are a number of variables that could attribute to employee attrition. We will first visually screen each of the variables to look for potential leading indicators. The full list of variables includes: 
 
 - Age  
 - Business Travel  
@@ -88,473 +92,103 @@ There are a number of variables that could attribute to employee attrition. We w
 - Years Since Last Promotion  
 - Years With Current Manager  
 
-### Attrition based on age  
-Attrition looks to be slightly higher in people around 20 years of age.
+Before attrition across each variable, some of the numerical scales will need to put into various buckets. In order to determine appropriate buckets, we'll first plot histograms of the variables.
 ```{r}
 #| echo: true
 #| output: true
 #| warning: false
 #| error: false
+#| message: false
 employeeData |>
-  mutate(Age = round(Age/5)*5) |>
-  group_by(Age) |>
-  count(Attrition) |>
-  ggplot(aes(x = Age, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
+  select(Age, DailyRate, DistanceFromHome, HourlyRate, MonthlyIncome, MonthlyRate, TotalWorkingYears, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager) |>
+  pivot_longer(cols = everything(), names_to = "column", values_to = "value") |>
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(~column, scales = 'free', ncol = 3)
 ```
 
-#### Attrition based on business travel  
-There is an increase in attrition rate as travel increases
+Based on visually inspecting the histograms, we'll use the following buckets for various numerical variables:
+
+- Age (5 years)  
+- Daily rate (400 dollars)  
+- Distance from home (5 miles)  
+- Hourly rate (20 dollars)  
+- Monthly income (5,000 dollars)  
+- Monthly rate (5,000 dollars)
+- Total working years (5 years)  
+- Years at company (5 years)  
+- Years in current role (5 years)  
+- Years since last promotion (5 years)  
+- Years under current manager (5 years)
+
 ```{r}
 #| echo: true
 #| output: true
 #| warning: false
 #| error: false
-employeeData |>
-  group_by(BusinessTravel) |>
-  count(Attrition) |>
-  ggplot(aes(x = BusinessTravel, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
+#| message: false
+employeeDataWithBuckets = employeeData |>
+  mutate(
+    Age = round(Age/5)*5, 
+    DailyRate = round(DailyRate/400)*400,
+    DistanceFromHome = round(DistanceFromHome/5)*5,
+    HourlyRate = round(HourlyRate/20)*20,
+    MonthlyIncome = round(MonthlyIncome/5000)*5000,
+    MonthlyRate = round(MonthlyRate/5000)*5000,
+    TotalWorkingYears = round(TotalWorkingYears/5)*5,
+    YearsAtCompany = round(YearsAtCompany/5)*5,
+    YearsInCurrentRole = round(YearsInCurrentRole/5)*5,
+    YearsSinceLastPromotion = round(YearsSinceLastPromotion/5)*5,
+    YearsWithCurrManager = round(YearsWithCurrManager/5)*5)
 ```
 
-#### Attrition based on daily rate?  
-Attrition looks to be slightly higher around the 400 dollar group, but consistent everywhere else
+Now we'll go through and create plots of each variable showing the breakdown between attrition to visually look for any strong relationships
 ```{r}
 #| echo: true
 #| output: true
 #| warning: false
 #| error: false
-employeeData |>
-  ggplot(aes(x = DailyRate)) +
-  geom_histogram()
+#| message: false
+#| fig-width: 12
+#| fig-height: 15
+findAttritionBreakdown = function(df, colName) {
+  df |>
+    group_by(!!sym(colName)) |>
+    count(Attrition) |>
+    ungroup() |>
+    ggplot(aes(x = !!sym(colName), y = n, fill = Attrition)) +
+    geom_col(position = "fill") +
+    coord_cartesian(ylim = c(0, 0.5))
+}
+findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")
 
-employeeData |>
-  mutate(DailyRate = round(DailyRate/400)*400) |>
-  group_by(DailyRate) |>
-  count(Attrition) |>
-  ggplot(aes(x = DailyRate, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
+cols = colnames(employeeData)
+# Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) 
+cols = cols[c(-1, -3, -10, -11, -23, -28)]
+
+plots = map(cols, function(col) findAttritionBreakdown(employeeDataWithBuckets, col))
+grid.arrange(grobs = plots, ncol = 3) ## display plots on one page
 ```
 
-#### Attrition based on department?  
-Nothing significant as far various departments having higher / lower attrition
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(Department) |>
-  count(Attrition) |>
-  ggplot(aes(x = Department, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
+### Top variables based on visual screening
 
-#### Attrition based on commute?  
-Attrition looks to be significantly higher for people around 15 miles of distance traveled or higher
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = DistanceFromHome)) +
-  geom_histogram()
+-   Job involvement
+-   Environment satisfaction
+-   Education
+-   Age
+-   Commute
+-   Department
+-   Job role
+-   Job satisfaction
+-   Marital status
+-   Number of prior companies
+-   Overtime
+-   Stock option
+-   Total working years
+-   Work life balance
+-   Years at company
+-   Years in current role
+-   Years with current manager
 
-employeeData |>
-  mutate(DistanceFromHome = round(DistanceFromHome/5)*5) |>
-  group_by(DistanceFromHome) |>
-  count(Attrition) |>
-  ggplot(aes(x = DistanceFromHome, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
 
-#### Attrition based on education  
-Attrition decreases with education level consistently
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(Education) |>
-  count(Attrition) |>
-  ggplot(aes(x = Education, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
 
-#### Attrition based on education field  
-Attrition is slightly higher in HR followed by Technical Degree, then marketing
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(EducationField) |>
-  count(Attrition) |>
-  ggplot(aes(x = EducationField, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on environment satisfaction  
-Low environment satisfaction has slightly higher attrition, otherwise 2-4 are ~equal
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(EnvironmentSatisfaction) |>
-  count(Attrition) |>
-  ggplot(aes(x = EnvironmentSatisfaction, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on gender  
-The breakdown in preference between males and females looks to be insignificant
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(Gender) |>
-  count(Attrition) |>
-  ggplot(aes(x = Gender, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on hourly rate  
-No significant trends in hourly rate and attrition
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = HourlyRate)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(HourlyRate = round(DailyRate/200)*200) |>
-  group_by(HourlyRate) |>
-  count(Attrition) |>
-  ggplot(aes(x = HourlyRate, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on job involvement  
-High correlation with job involvement and attrition
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(JobInvolvement) |>
-  count(Attrition) |>
-  ggplot(aes(x = JobInvolvement, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on job level  
-1 job level has higher attrition, but other than that no obvious trends
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(JobLevel) |>
-  count(Attrition) |>
-  ggplot(aes(x = JobLevel, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on job role  
-Significantly higher attrition in sales representative
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(JobRole) |>
-  count(Attrition) |>
-  ggplot(aes(x = JobRole, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on job satisfaction  
-1 job level has higher attrition decreasing as job satisfaction increases
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(JobSatisfaction) |>
-  count(Attrition) |>
-  ggplot(aes(x = JobSatisfaction, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on marital status  
-Higher attrition for single and decreasing for married and further for divorced
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(MaritalStatus) |>
-  count(Attrition) |>
-  ggplot(aes(x = MaritalStatus, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on monthly income  
-Highest attrition in less than 5000 monthly income
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = MonthlyIncome)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(MonthlyIncome = round(MonthlyIncome/5000)*5000) |>
-  group_by(MonthlyIncome) |>
-  count(Attrition) |>
-  ggplot(aes(x = MonthlyIncome, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on monthly rate  
-Slightly highest around 10000 decreasing lower and higher
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = MonthlyRate)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(MonthlyRate = round(MonthlyRate/5000)*5000) |>
-  group_by(MonthlyRate) |>
-  count(Attrition) |>
-  ggplot(aes(x = MonthlyRate, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on number of previous companies  
-Highest for people who have worked at 5 or more companies, meaning people might have a tendency to change jobs a lot. There's also a slight uptick at low which may indicate individuals that are prone to leave frequently.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(NumCompaniesWorked) |>
-  count(Attrition) |>
-  ggplot(aes(x = NumCompaniesWorked, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on working over time  
-Highest attrition in people working overtime
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(OverTime) |>
-  count(Attrition) |>
-  ggplot(aes(x = OverTime, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on percent salary hike  
-No real obvious trends. Slightly higher around the 22-24% salary increase range
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(PercentSalaryHike) |>
-  count(Attrition) |>
-  ggplot(aes(x = PercentSalaryHike, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on performance rating  
-Nothing significant in performance rating
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(PerformanceRating) |>
-  count(Attrition) |>
-  ggplot(aes(x = PerformanceRating, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on relationship satisfaction  
-Slightly higher in lower relationship satisfaction
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(RelationshipSatisfaction) |>
-  count(Attrition) |>
-  ggplot(aes(x = RelationshipSatisfaction, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on stock option level  
-Highest among 0 and 3 (lower at 1 and 2)
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(StockOptionLevel) |>
-  count(Attrition) |>
-  ggplot(aes(x = StockOptionLevel, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on total working years  
-Attrition is highest in people during their first 5 years and then levels off. At 40 years people begin retiring.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = TotalWorkingYears)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(TotalWorkingYears = round(TotalWorkingYears/5)*5) |>
-  group_by(TotalWorkingYears) |>
-  count(Attrition) |>
-  ggplot(aes(x = TotalWorkingYears, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on training times  
-No noticeable patterns
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(TrainingTimesLastYear) |>
-  count(Attrition) |>
-  ggplot(aes(x = TrainingTimesLastYear, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on work life balance  
-Significant trend in attrition with lower work life balance and decreasing as work life balance improves
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  group_by(WorkLifeBalance) |>
-  count(Attrition) |>
-  ggplot(aes(x = WorkLifeBalance, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on years at company  
-Slightly higher for people in their first 5 years. People over 40 are retiring.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = YearsAtCompany)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(YearsAtCompany = round(YearsAtCompany/5)*5) |>
-  group_by(YearsAtCompany) |>
-  count(Attrition) |>
-  ggplot(aes(x = YearsAtCompany, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on years at company  
-Slightly higher for people in their first 5 years. People worked over 20 years in the current role show no attrition.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = YearsInCurrentRole)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(YearsInCurrentRole = round(YearsInCurrentRole/5)*5) |>
-  group_by(YearsInCurrentRole) |>
-  count(Attrition) |>
-  ggplot(aes(x = YearsInCurrentRole, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on years since last promotion  
-Slightly higher attrition for people over 15 years since their last promotion but otherwise no trends
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = YearsSinceLastPromotion)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(YearsSinceLastPromotion = round(YearsSinceLastPromotion/5)*5) |>
-  group_by(YearsSinceLastPromotion) |>
-  count(Attrition) |>
-  ggplot(aes(x = YearsSinceLastPromotion, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
-
-#### Attrition based on years with current manager  
-Longer time spent with current manager the less likely there is for attrition
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-employeeData |>
-  ggplot(aes(x = YearsWithCurrManager)) +
-  geom_histogram()
-
-employeeData |>
-  mutate(YearsWithCurrManager = round(YearsWithCurrManager/5)*5) |>
-  group_by(YearsWithCurrManager) |>
-  count(Attrition) |>
-  ggplot(aes(x = YearsWithCurrManager, y = n, fill = Attrition)) +
-  geom_col(position = "fill")
-```
