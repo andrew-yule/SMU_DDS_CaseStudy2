@@ -156,7 +156,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </section>
 <section id="identifying-the-top-three-factors-that-contribute-to-attrition" class="level2">
-<h2 class="anchored" data-anchor-id="identifying-the-top-three-factors-that-contribute-to-attrition">Identifying the top three factors that contribute to attrition</h2>
+<h2 class="anchored" data-anchor-id="identifying-the-top-three-factors-that-contribute-to-attrition">1. Identifying the top three factors that contribute to attrition</h2>
 <section id="how-many-of-the-870-employees-in-the-data-actually-left" class="level4">
 <h4 class="anchored" data-anchor-id="how-many-of-the-870-employees-in-the-data-actually-left">How many of the 870 employees in the data actually left?</h4>
 <p>There were 140 out of 870 employees (16%) that left.</p>
@@ -174,83 +174,45 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <section id="screening-all-variables-to-visually-investigate-which-parameters-are-the-highest-indicators-of-attrition" class="level3">
 <h3 class="anchored" data-anchor-id="screening-all-variables-to-visually-investigate-which-parameters-are-the-highest-indicators-of-attrition">Screening all variables to visually investigate which parameters are the highest indicators of attrition</h3>
 <p>There are a number of variables that could attribute to employee attrition. We will first visually screen each of the variables to look for potential leading indicators. The full list of variables includes:</p>
-<ul>
-<li>Age<br>
-</li>
-<li>Business Travel<br>
-</li>
-<li>Daily Rate<br>
-</li>
-<li>Department<br>
-</li>
-<li>Distance From Home<br>
-</li>
-<li>Education<br>
-</li>
-<li>Education Field<br>
-</li>
-<li>Environment Satisfaction<br>
-</li>
-<li>Gender<br>
-</li>
-<li>Hourly Rate<br>
-</li>
-<li>Job Involvement<br>
-</li>
-<li>Job Level<br>
-</li>
-<li>Job Role<br>
-</li>
-<li>Job Satisfaction<br>
-</li>
-<li>Marital Status<br>
-</li>
-<li>Monthly Income<br>
-</li>
-<li>Monthly Rate<br>
-</li>
-<li>Number of Previous Companies Worked For<br>
-</li>
-<li>Over Time<br>
-</li>
-<li>Percent Salary Hike<br>
-</li>
-<li>Performance Rating<br>
-</li>
-<li>Relationship Satisfaction<br>
-</li>
-<li>Stock Options<br>
-</li>
-<li>Total Working Years<br>
-</li>
-<li>Training Times Last Year<br>
-</li>
-<li>Work Life Balance<br>
-</li>
-<li>Years At Company<br>
-</li>
-<li>Years In Current Role<br>
-</li>
-<li>Years Since Last Promotion<br>
-</li>
-<li>Years With Current Manager</li>
-</ul>
-<p>Before attrition across each variable, some of the numerical scales will need to put into various buckets. In order to determine appropriate buckets, we’ll first plot histograms of the variables.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>employeeData <span class="sc">|&gt;</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Age, DailyRate, DistanceFromHome, HourlyRate, MonthlyIncome, MonthlyRate, TotalWorkingYears, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"column"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value)) <span class="sc">+</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>column, <span class="at">scales =</span> <span class="st">'free'</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(employeeData)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "ID"                       "Age"                     
+ [3] "Attrition"                "BusinessTravel"          
+ [5] "DailyRate"                "Department"              
+ [7] "DistanceFromHome"         "Education"               
+ [9] "EducationField"           "EmployeeCount"           
+[11] "EmployeeNumber"           "EnvironmentSatisfaction" 
+[13] "Gender"                   "HourlyRate"              
+[15] "JobInvolvement"           "JobLevel"                
+[17] "JobRole"                  "JobSatisfaction"         
+[19] "MaritalStatus"            "MonthlyIncome"           
+[21] "MonthlyRate"              "NumCompaniesWorked"      
+[23] "Over18"                   "OverTime"                
+[25] "PercentSalaryHike"        "PerformanceRating"       
+[27] "RelationshipSatisfaction" "StandardHours"           
+[29] "StockOptionLevel"         "TotalWorkingYears"       
+[31] "TrainingTimesLastYear"    "WorkLifeBalance"         
+[33] "YearsAtCompany"           "YearsInCurrentRole"      
+[35] "YearsSinceLastPromotion"  "YearsWithCurrManager"    </code></pre>
+</div>
+</div>
+<p>Before investigating attrition across each variable, some of the numerical scales will need to put into various bins to make analysis easier. In order to determine appropriate bins, we’ll first plot histograms of the numerical variables, which include: Age, DailyRate, DistanceFromHome, HourlyRate, MonthlyIncome, MonthlyRate, TotalWorkingYears, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>employeeData <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Age, DailyRate, DistanceFromHome, HourlyRate, MonthlyIncome, MonthlyRate, TotalWorkingYears, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager) <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">everything</span>(), <span class="at">names_to =</span> <span class="st">"column"</span>, <span class="at">values_to =</span> <span class="st">"value"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> value)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>column, <span class="at">scales =</span> <span class="st">'free'</span>, <span class="at">ncol =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Based on visually inspecting the histograms, we’ll use the following buckets for various numerical variables:</p>
+<p>Based on visually inspecting the histograms, the following bins for various numerical variables will be used:</p>
 <ul>
 <li>Age (5 years)<br>
 </li>
@@ -274,44 +236,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li>Years under current manager (5 years)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>employeeDataWithBuckets <span class="ot">=</span> employeeData <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Age =</span> <span class="fu">round</span>(Age<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>, </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">DailyRate =</span> <span class="fu">round</span>(DailyRate<span class="sc">/</span><span class="dv">400</span>)<span class="sc">*</span><span class="dv">400</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">DistanceFromHome =</span> <span class="fu">round</span>(DistanceFromHome<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">HourlyRate =</span> <span class="fu">round</span>(HourlyRate<span class="sc">/</span><span class="dv">20</span>)<span class="sc">*</span><span class="dv">20</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">MonthlyIncome =</span> <span class="fu">round</span>(MonthlyIncome<span class="sc">/</span><span class="dv">5000</span>)<span class="sc">*</span><span class="dv">5000</span>,</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">MonthlyRate =</span> <span class="fu">round</span>(MonthlyRate<span class="sc">/</span><span class="dv">5000</span>)<span class="sc">*</span><span class="dv">5000</span>,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">TotalWorkingYears =</span> <span class="fu">round</span>(TotalWorkingYears<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsAtCompany =</span> <span class="fu">round</span>(YearsAtCompany<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsInCurrentRole =</span> <span class="fu">round</span>(YearsInCurrentRole<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsSinceLastPromotion =</span> <span class="fu">round</span>(YearsSinceLastPromotion<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsWithCurrManager =</span> <span class="fu">round</span>(YearsWithCurrManager<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>employeeDataWithBuckets <span class="ot">=</span> employeeData <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">Age =</span> <span class="fu">round</span>(Age<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">DailyRate =</span> <span class="fu">round</span>(DailyRate<span class="sc">/</span><span class="dv">400</span>)<span class="sc">*</span><span class="dv">400</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">DistanceFromHome =</span> <span class="fu">round</span>(DistanceFromHome<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">HourlyRate =</span> <span class="fu">round</span>(HourlyRate<span class="sc">/</span><span class="dv">20</span>)<span class="sc">*</span><span class="dv">20</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">MonthlyIncome =</span> <span class="fu">round</span>(MonthlyIncome<span class="sc">/</span><span class="dv">5000</span>)<span class="sc">*</span><span class="dv">5000</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">MonthlyRate =</span> <span class="fu">round</span>(MonthlyRate<span class="sc">/</span><span class="dv">5000</span>)<span class="sc">*</span><span class="dv">5000</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">TotalWorkingYears =</span> <span class="fu">round</span>(TotalWorkingYears<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsAtCompany =</span> <span class="fu">round</span>(YearsAtCompany<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsInCurrentRole =</span> <span class="fu">round</span>(YearsInCurrentRole<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsSinceLastPromotion =</span> <span class="fu">round</span>(YearsSinceLastPromotion<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">YearsWithCurrManager =</span> <span class="fu">round</span>(YearsWithCurrManager<span class="sc">/</span><span class="dv">5</span>)<span class="sc">*</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Now we’ll go through and create plots of each variable showing the breakdown between attrition to visually look for any strong relationships</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>findAttritionBreakdown <span class="ot">=</span> <span class="cf">function</span>(df, colName) {</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="sc">!!</span><span class="fu">sym</span>(colName)) <span class="sc">|&gt;</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Attrition) <span class="sc">|&gt;</span></span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(colName), <span class="at">y =</span> n, <span class="at">fill =</span> Attrition)) <span class="sc">+</span></span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.55</span>))</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">#findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")</span></span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> <span class="fu">colnames</span>(employeeData)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) </span></span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> cols[<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">11</span>, <span class="sc">-</span><span class="dv">23</span>, <span class="sc">-</span><span class="dv">28</span>)]</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">map</span>(cols, <span class="cf">function</span>(col) <span class="fu">findAttritionBreakdown</span>(employeeDataWithBuckets, col))</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> plots, <span class="at">ncol =</span> <span class="dv">3</span>) <span class="do">## display plots on one page</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Helper function that creates a plot showing the breakdown in attrition for a given variable across it's possible values</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>findAttritionBreakdown <span class="ot">=</span> <span class="cf">function</span>(df, colName) {</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  df <span class="sc">|&gt;</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(<span class="sc">!!</span><span class="fu">sym</span>(colName)) <span class="sc">|&gt;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">count</span>(Attrition) <span class="sc">|&gt;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="sc">!!</span><span class="fu">sym</span>(colName), <span class="at">y =</span> n, <span class="at">fill =</span> Attrition)) <span class="sc">+</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"fill"</span>) <span class="sc">+</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">coord_cartesian</span>(<span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.55</span>))</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Test the function</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">#findAttritionBreakdown(employeeDataWithBuckets, "DistanceFromHome")</span></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> <span class="fu">colnames</span>(employeeData)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop columns that we don't want to include in the analysis (ID, Attrition, EmployeeCount, EmployeeNumber, Over18, StandardHours) </span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">=</span> cols[<span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="sc">-</span><span class="dv">3</span>, <span class="sc">-</span><span class="dv">10</span>, <span class="sc">-</span><span class="dv">11</span>, <span class="sc">-</span><span class="dv">23</span>, <span class="sc">-</span><span class="dv">28</span>)]</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a list of plots across all of the columns using the map function from the purr package</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>plots <span class="ot">=</span> <span class="fu">map</span>(cols, <span class="cf">function</span>(col) <span class="fu">findAttritionBreakdown</span>(employeeDataWithBuckets, col))</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Display plots on one page</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="fu">grid.arrange</span>(<span class="at">grobs =</span> plots, <span class="at">ncol =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="1152"></p>
+<p><img src="SMU_DDS_CaseStudy2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="1152"></p>
 </div>
 </div>
-<p>Based on examining the plots above, the following key variables were identified</p>
+<p>Based on examining the plots above, the following key variables were identified:</p>
 <ul>
 <li>Age<br>
 </li>
@@ -345,12 +311,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ul>
 <p>In order to quantitatively determine the top 3 variables influencing attrition, we’ll build a logistic regression model using the variables above. Before using the results of that regression to determine top variables influencing attrition, we’ll first use cross validation to determine the type of accuracy that can be achieved using logistic regression.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a generalized linear model using a binomial family to perform logistic regression</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">train</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">data =</span> employeeData, <span class="at">method =</span> <span class="st">"glm"</span>, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"LOOCV"</span>))</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize the results to determine the possible accuracy</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a generalized linear model using a binomial family to perform logistic regression</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">train</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">data =</span> employeeData, <span class="at">method =</span> <span class="st">"glm"</span>, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">trControl =</span> <span class="fu">trainControl</span>(<span class="at">method =</span> <span class="st">"LOOCV"</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Summarize the results to determine the possible accuracy</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>model</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Generalized Linear Model 
 
@@ -369,17 +335,17 @@ Resampling results:
 </div>
 <p>Using cross validation on our logistic regression, we can achieve an accuracy of over 88% which is high enough to warrant further use of the model to determine key variables influencing attrition.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change Attrition (no/yes) into numerical values to work within the glm function</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>employeeDataForLogisticRegression <span class="ot">=</span> employeeData <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Attrition =</span> <span class="fu">ifelse</span>(Attrition <span class="sc">==</span> <span class="st">"No"</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the logistic regression model</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">glm</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> employeeDataForLogisticRegression)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the results of the model fitting along with the broom package which collects model metrics into data frames to quantitatively determine the top parameters</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model) <span class="sc">|&gt;</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Change Attrition (no/yes) into numerical values to work within the glm function</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>employeeDataForLogisticRegression <span class="ot">=</span> employeeData <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Attrition =</span> <span class="fu">ifelse</span>(Attrition <span class="sc">==</span> <span class="st">"No"</span>, <span class="dv">0</span>, <span class="dv">1</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the logistic regression model</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>model <span class="ot">=</span> <span class="fu">glm</span>(Attrition <span class="sc">~</span> Age <span class="sc">+</span> BusinessTravel <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> DistanceFromHome <span class="sc">+</span> Education <span class="sc">+</span> EnvironmentSatisfaction <span class="sc">+</span> JobInvolvement <span class="sc">+</span> JobRole <span class="sc">+</span> JobSatisfaction <span class="sc">+</span> MaritalStatus <span class="sc">+</span> NumCompaniesWorked <span class="sc">+</span> OverTime <span class="sc">+</span> StockOptionLevel <span class="sc">+</span> TotalWorkingYears <span class="sc">+</span> WorkLifeBalance <span class="sc">+</span> YearsWithCurrManager, <span class="at">family =</span> <span class="st">"binomial"</span>, <span class="at">data =</span> employeeDataForLogisticRegression)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Use the results of the model fitting along with the broom package which collects model metrics into data frames to quantitatively determine the top parameters</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(model) <span class="sc">|&gt;</span></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.2</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(<span class="fu">abs</span>(estimate)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 17 × 5
    term                            estimate std.error statistic  p.value
@@ -403,9 +369,39 @@ Resampling results:
 17 Age                              -0.0308    0.0174     -1.77 7.66e- 2</code></pre>
 </div>
 </div>
-<p>Based on the results from the logistic regression model, it looks the following variables are the top 3 when determining possible employee attrition:<br>
-1. X</p>
+<p>Based on the results from the logistic regression model, the following variables are found to be the most important when determining possible employee attrition:</p>
+<ol type="1">
+<li>Job role</li>
+</ol>
+<ul>
+<li>Most notably sales representative positions see very high attrition, while research and manufacturing directories typically have very little attrition<br>
+</li>
+</ul>
+<ol start="2" type="1">
+<li>Over time</li>
+</ol>
+<ul>
+<li>Employees that work overtime are much more likely to have attrition than those that do not<br>
+</li>
+</ul>
+<ol start="3" type="1">
+<li>Marital status</li>
+</ol>
+<ul>
+<li>Single employees are much more likely to have attrition than those that are married and even more so than those that are divorced</li>
+</ul>
+<p>Additional notable variables included:</p>
+<ol type="1">
+<li>Business travel - regular travel was highly correlated with higher attrition<br>
+</li>
+<li>Job involvement - low job involvement was highly correlated with higher attrition<br>
+</li>
+<li>Work life balance - lower work life balance was highly correlated with higher attrition</li>
+</ol>
 </section>
+</section>
+<section id="learn-about-any-job-role-specific-trends-that-may-exist-in-the-data-set" class="level2">
+<h2 class="anchored" data-anchor-id="learn-about-any-job-role-specific-trends-that-may-exist-in-the-data-set">1. Learn about any job role specific trends that may exist in the data set</h2>
 </section>
 
 </main>
