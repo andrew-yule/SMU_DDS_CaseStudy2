@@ -15,7 +15,7 @@ The specific goals of this analysis are to:
 
 3.  Provide any other interesting trends and observations from your analysis.  
 
-4.  Build a model to predict attrition and salaries
+4.  Build models to predict attrition and salaries
 
 ## Executive Summary
 To be filled in
@@ -29,7 +29,7 @@ To be filled in
 #| message: false
 library(tidyverse)
 library(gridExtra)
-library(broom)
+library(reshape2)
 library(class)
 library(caret)
 library(e1071)
@@ -117,8 +117,7 @@ employeeDataBinned = employeeData |>
     YearsAtCompany = round(YearsAtCompany/5)*5,
     YearsInCurrentRole = round(YearsInCurrentRole/5)*5,
     YearsSinceLastPromotion = round(YearsSinceLastPromotion/5)*5,
-    YearsWithCurrManager = round(YearsWithCurrManager/5)*5,
-    Attrition = ifelse(Attrition == "Yes", 1, 0))
+    YearsWithCurrManager = round(YearsWithCurrManager/5)*5)
 ```
 
 Now we'll go through and create plots of each variable showing the breakdown between attrition to visually look for any strong relationships
@@ -195,10 +194,13 @@ calcLogLikelihoodData = function(data){
   }
 }
 
-nullModel = calcLogLikelihoodData(count(employeeDataBinned, Attrition))
+employeeDataBinnedWithQuantitativeAttrition = employeeDataBinned |>
+  mutate(Attrition = ifelse(Attrition == "Yes", 1, 0))
+
+nullModel = calcLogLikelihoodData(count(employeeDataBinnedWithQuantitativeAttrition, Attrition))
 
 calcPseudoRSquared = function(var){
-  employeeDataBinned |>
+  employeeDataBinnedWithQuantitativeAttrition |>
     group_by(!!sym(var)) |>
     count(Attrition) |>
     group_modify(function(group, blah) calcLogLikelihoodData(select(group, Attrition, n))) |>
@@ -227,66 +229,15 @@ Based on the analysis above, the top 3 factors influencing employee attrition ar
 2. Stock Option Level  
 3. Over Time
 
+The next 3 factors following the top 3 are:
 
-
-In order to quantitatively determine the top 3 variables influencing attrition, we'll build a logistic regression model using the variables above. Before using the results of that regression to determine top variables influencing attrition, we'll first use cross validation to determine the type of accuracy that can be achieved using logistic regression.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-#| message: false
-
-# Train a generalized linear model using a binomial family to perform logistic regression
-set.seed(1234)
-model = train(Attrition ~ Age + BusinessTravel + DistanceFromHome + DistanceFromHome + Education + EnvironmentSatisfaction + JobInvolvement + JobRole + JobSatisfaction + MaritalStatus + MonthlyIncome + NumCompaniesWorked + OverTime + StockOptionLevel + TotalWorkingYears + WorkLifeBalance + YearsWithCurrManager, data = employeeData, method = "glm", family = "binomial", trControl = trainControl(method = "LOOCV"))
-
-# Summarize the results to determine the possible accuracy
-model
-```
-
-Using cross validation on our logistic regression, we can achieve an accuracy of over 88% which is high enough to warrant further use of the model to determine key variables influencing attrition.
-```{r}
-#| echo: true
-#| output: true
-#| warning: false
-#| error: false
-#| message: false
-# Change Attrition (no/yes) into numerical values to work within the glm function
-employeeDataForLogisticRegression = employeeData |>
-  mutate(Attrition = ifelse(Attrition == "No", 0, 1))
-
-# Fit the logistic regression model
-model = glm(Attrition ~ Age + BusinessTravel + DistanceFromHome + DistanceFromHome + Education + EnvironmentSatisfaction + JobInvolvement + JobRole + JobSatisfaction + MaritalStatus + MonthlyIncome + NumCompaniesWorked + OverTime + StockOptionLevel + TotalWorkingYears + WorkLifeBalance + YearsWithCurrManager, family = "binomial", data = employeeDataForLogisticRegression)
-
-# Use the results of the model fitting along with the broom package which collects model metrics into data frames to quantitatively determine the top parameters
-tidy(model) |>
-  #filter(p.value < 0.2) |>
-  arrange(desc(abs(estimate))) |>
-  print(n = 26)
-```
-
-Based on the results from the logistic regression model, the following variables are found to be the most important when determining possible employee attrition:
-
-1. Job role
-  - Most notably sales representative positions see very high attrition, while research and manufacturing directories typically have very little attrition  
-2. Over time
-  - Employees that work overtime are much more likely to have attrition than those that do not  
-3. Marital status
-  - Single employees are much more likely to have attrition than those that are married and even more so than those that are divorced  
-
-Additional notable variables included:  
-
-1. Business travel
-  - Regular travel was highly correlated with higher attrition  
-2. Job involvement
-  - Low job involvement was highly correlated with higher attrition  
-3. Work life balance
-  - Lower work life balance was highly correlated with higher attrition
+1. Total Working Years  
+2. Years At Company  
+3. Monthly Income
 
 ## 2. Learn about any job role specific trends that may exist in the data set
 
-Looking closer at various job roles, it is clear that sales and HR type positions see large amounts of turnover while managing and director type roles see very little.
+We know that Job Role is our number one predictor of employee attrition. Looking closer at various reported job roles, it is clear that sales type positions see much larger amounts of turnover while managing and director type roles see very little.
 ```{r}
 #| echo: true
 #| output: true
@@ -301,42 +252,66 @@ employeeData |>
   labs(title = "Attrition Percentage Across Various Job Roles", x = "Attrition Percentage", y = NULL)
 ```
 
-Let's investigate a little closer to see why sales / HR may have high attrition while managing / directing roles have low attrition
+Knowing that stock options, over time, and monthly income are key also key indicators of attrition, we can use those to better understand why sales positions see higher attrition.
 ```{r}
 #| echo: true
 #| output: true
 #| warning: false
 #| error: false
 #| message: false
+# Looking at stock options
+employeeDataBinnedWithQuantitativeAttrition |>
+  mutate(JobRole = factor(JobRole, levels = c("Sales Representative", "Human Resources", "Laboratory Technician", "Research Scientist", "Sales Executive", "Healthcare Representative", "Manager", "Manufacturing Director", "Research Director"))) |>
+  group_by(JobRole) |>
+  count(StockOptionLevel) |>
+  ungroup() |>
+  ggplot(aes(x = JobRole, y = n, fill = StockOptionLevel)) +
+  geom_col(position = "fill")
 
-# Check whether sales / HR make less money compared to the average and whether managers / directors make more compared to the average
-ggplot() +
-  stat_ecdf(
-    data = employeeData, 
-    aes(x = MonthlyIncome), color = "black") +
-  stat_ecdf(
-    data = filter(employeeData, JobRole == "Sales Representative"), 
-    aes(x = MonthlyIncome), color = "red") +
-  stat_ecdf(
-    data = filter(employeeData, JobRole == "Human Resources"), 
-    aes(x = MonthlyIncome), color = "Orange") +
-  stat_ecdf(
-    data = filter(employeeData, JobRole == "Manufacturing Director"), 
-    aes(x = MonthlyIncome), color = "purple") +
-  stat_ecdf(
-    data = filter(employeeData, JobRole == "Research Director"), 
-    aes(x = MonthlyIncome), color = "blue")
+# Looking at over time
+employeeDataBinnedWithQuantitativeAttrition |>
+  mutate(JobRole = factor(JobRole, levels = c("Sales Representative", "Human Resources", "Laboratory Technician", "Research Scientist", "Sales Executive", "Healthcare Representative", "Manager", "Manufacturing Director", "Research Director"))) |>
+  group_by(JobRole) |>
+  count(OverTime) |>
+  ungroup() |>
+  ggplot(aes(x = JobRole, y = n, fill = OverTime)) +
+  geom_col(position = "fill")
+
+# Looking at monthly income
+employeeData |>
+  mutate(JobRole = factor(JobRole, levels = c("Sales Representative", "Human Resources", "Laboratory Technician", "Research Scientist", "Sales Executive", "Healthcare Representative", "Manager", "Manufacturing Director", "Research Director"))) |>
+  ggplot(aes(x = JobRole, y = MonthlyIncome)) +
+  geom_boxplot()
 ```
 
+Analyzing Sales Representatives individually we see that they rank very highly in all of the categories that contribute the most to attrition. They have a proportionally smaller amount of stock options generally, they work slightly more overtime than most other positions with the exception of research scientist, and they are the lowest paid.
+
+## 3. Provide any other interesting trends and observations from your analysis
+
+Let's look at some of the quantitative variables to look for any interesting trends
 ```{r}
-set.seed(1234)
-model = train(Attrition ~ MonthlyIncome, data = employeeData, method = "glm", family = "binomial", trControl = trainControl(method = "LOOCV"))
-
-# Summarize the results to determine the possible accuracy
-model
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+employeeData |>
+  select(Age, DistanceFromHome, Education, JobInvolvement, JobLevel, JobSatisfaction, MonthlyIncome, NumCompaniesWorked, PercentSalaryHike, PerformanceRating, RelationshipSatisfaction, TotalWorkingYears, TrainingTimesLastYear, WorkLifeBalance, YearsAtCompany, YearsInCurrentRole, YearsSinceLastPromotion, YearsWithCurrManager) |>
+  cor() |>
+  round(2) |>
+  melt() |>
+  ggplot(aes(x=Var1, y=Var2, fill=value)) +
+  geom_tile() +
+  theme(axis.text.x = element_text(angle = 90))
 ```
 
+From the above correlation heat map, we can make the following observations:
 
+- Years at company, years in current role, years since last promotion, and years with current manager are all closely related as they all relate to how long a particular employee has been at the current job  
+- High performance rating is correlated with higher salary hikes  
+- There were no strong correlations for work life balance which could mean there are other non-numerical indicators for work life balance, or it depends more on the individual making it difficult to predict
+
+## 4. Build models to predict attrition and salaries
 
 
 
