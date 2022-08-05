@@ -352,6 +352,23 @@ results |>
   geom_boxplot()
 ```
 
+Predicting attrition on the blind test set and then outputting to a csv file
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+blindTestData = read_csv("https://raw.githubusercontent.com/ayule89/SMU_DDS_CaseStudy2/main/Data/CaseStudy2CompSet%20No%20Attrition.csv")
+
+model = naiveBayes(Attrition ~ JobRole + StockOptionLevel + OverTime + TotalWorkingYears + YearsAtCompany + MonthlyIncome + JobLevel + Age + MaritalStatus + JobInvolvement + YearsInCurrentRole + NumCompaniesWorked + YearsWithCurrManager + PercentSalaryHike + WorkLifeBalance + JobSatisfaction, employeeDataForPrediction)
+
+predictions = predict(model, select(blindTestData, JobRole, StockOptionLevel, OverTime, TotalWorkingYears, YearsAtCompany, MonthlyIncome, JobLevel, Age, MaritalStatus, JobInvolvement, YearsInCurrentRole, NumCompaniesWorked, YearsWithCurrManager, PercentSalaryHike, WorkLifeBalance, JobSatisfaction))
+
+blindTestResults = tibble("ID" = blindTestData$ID, "Attrition" = predictions)
+write_csv(blindTestResults,"/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Case 2 Predictions Yule Attrition.csv")
+```
+
 To predict salaries, a linear regression model was used
 ```{r}
 #| echo: true
@@ -360,6 +377,46 @@ To predict salaries, a linear regression model was used
 #| error: false
 #| message: false
 
+rmse = function(actual, predicted) {
+  sqrt(mean((actual - predicted)^2))
+}
+
+set.seed(1234)
+evaluateModel = function() {
+  l = length(employeeData$MonthlyIncome)
+  indicies = sample(seq(1:l), round(0.75*l))
+  train = employeeData[indicies,]
+  test = employeeData[-indicies,]
+  
+  model = lm(MonthlyIncome ~ Age + JobRole + YearsAtCompany + StockOptionLevel + PerformanceRating, data = train)
+  predictions = predict(model, test)
+  tibble("RMSE" = rmse(test$MonthlyIncome, predictions))
+}
+
+results = tibble("RMSE" = c(NULL))
+for (variable in 1:200) {
+  results = rbind(results, evaluateModel())
+}
+
+results |>
+  ggplot(aes(x = RMSE)) +
+  geom_histogram()
+```
+
+Predicting attrition on the blind test set and then outputting to a csv file
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+blindTestData = read_csv("https://raw.githubusercontent.com/ayule89/SMU_DDS_CaseStudy2/main/Data/CaseStudy2CompSet%20No%20Salary.csv")
+
+model = lm(MonthlyIncome ~ Age + JobRole + YearsAtCompany + StockOptionLevel + PerformanceRating, data = employeeData)
+predictions = predict(model, blindTestData)
+
+blindTestResults = tibble("ID" = blindTestData$ID, "MonthlyIncome" = predictions)
+write_csv(blindTestResults,"/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Case 2 Predictions Yule Salary.csv")
 ```
 
 
