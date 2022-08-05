@@ -180,6 +180,7 @@ Based on examining the plots above, the following key variables were identified 
 - StockOptionLevel  
 - TotalWorkingYears  
 - WorkLifeBalance  
+- YearsAtCompany  
 - YearsWithCurrManager  
 
 In order to determine the top 3 factors quantitatively, we will calculate the Pseudo-R2 value for each predictor. This is based on a similar analysis that can be found [here](https://heap.io/blog/pseudo-r2-a-metric-for-quantifying-interestingness).
@@ -392,7 +393,7 @@ blindTestResults = tibble("ID" = blindTestData$ID, "Attrition" = predictions)
 write_csv(blindTestResults,"/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Case 2 Predictions Yule Attrition.csv")
 ```
 
-To predict salaries, a linear regression model was used. The goal was to achieve a high R Squared value and minimal root mean squared error (RMSE), while keeping the number of predictors as low as possible. The variables, Age, Job Role, Years At Company, and Stock Options were found to be good in predicting salary and lead to a model with an RSquared of around 0.85 and a RMSW of $1,850.
+To predict salaries, a linear regression model was used. The goal was to achieve a high R Squared value and minimal root mean squared error (RMSE), while keeping the number of predictors as low as possible. The variables, Age, Job Role, Years At Company, and Stock Options were found to be good in predicting salary and lead to a model with an RSquared of around 0.85 and a RMSE of $1,850.
 ```{r}
 #| echo: true
 #| output: true

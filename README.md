@@ -14,6 +14,10 @@ The following files can be found in this repository:
   - HTML containing the knitted output from the final quarto markdown file
 - Case Study 2 Assignment Submission.docx
   - File containing information about the final URL links to this repository as well as final YouTube presentation upload
+- Case 2 Predictions Yule Attrition.csv
+  - Attrition predictions from naive bayes model
+- Case 2 Predictions Yule Salary.csv
+  - Salary predictions from linear regression model
 - README
   - This file
 
@@ -21,5 +25,7 @@ In addition, the following folders are also part of this repository:
 
 - Data
   - Contains the full datasets used in this analysis including the employee attrition data set and any blind testing data set for model validation
+- SMU_DDS_CaseStudy2_files
+  - Rendered HTML file related documents from the quarto markdown rile
 
 

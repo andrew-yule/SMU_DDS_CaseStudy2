@@ -323,6 +323,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </li>
 <li>WorkLifeBalance<br>
 </li>
+<li>YearsAtCompany<br>
+</li>
 <li>YearsWithCurrManager</li>
 </ul>
 <p>In order to determine the top 3 factors quantitatively, we will calculate the Pseudo-R2 value for each predictor. This is based on a similar analysis that can be found <a href="https://heap.io/blog/pseudo-r2-a-metric-for-quantifying-interestingness">here</a>.</p>
@@ -519,7 +521,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>blindTestResults <span class="ot">=</span> <span class="fu">tibble</span>(<span class="st">"ID"</span> <span class="ot">=</span> blindTestData<span class="sc">$</span>ID, <span class="st">"Attrition"</span> <span class="ot">=</span> predictions)</span>
 <span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(blindTestResults,<span class="st">"/Users/andrewyule/Dropbox/Personal/SMU MSDS/03 - Doing Data Science/SMU_DDS_CaseStudy2/Case 2 Predictions Yule Attrition.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<p>To predict salaries, a linear regression model was used. The goal was to achieve a high R Squared value and minimal root mean squared error (RMSE), while keeping the number of predictors as low as possible. The variables, Age, Job Role, Years At Company, and Stock Options were found to be good in predicting salary and lead to a model with an RSquared of around 0.85 and a RMSW of $1,850.</p>
+<p>To predict salaries, a linear regression model was used. The goal was to achieve a high R Squared value and minimal root mean squared error (RMSE), while keeping the number of predictors as low as possible. The variables, Age, Job Role, Years At Company, and Stock Options were found to be good in predicting salary and lead to a model with an RSquared of around 0.85 and a RMSE of $1,850.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rmse <span class="ot">=</span> <span class="cf">function</span>(actual, predicted) {</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sqrt</span>(<span class="fu">mean</span>((actual <span class="sc">-</span> predicted)<span class="sc">^</span><span class="dv">2</span>))</span>
