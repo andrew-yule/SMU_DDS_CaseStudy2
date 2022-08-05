@@ -311,9 +311,56 @@ From the above correlation heat map, we can make the following observations:
 - High performance rating is correlated with higher salary hikes  
 - There were no strong correlations for work life balance which could mean there are other non-numerical indicators for work life balance, or it depends more on the individual making it difficult to predict
 
-## 4. Build models to predict attrition and salaries
+## 4. Build models to predict attrition and salary
 
+To predict attrition, a naive Bayes model was used with the goal of reaching the highest accuracy while preserving at least 60% for sensitivity and specificity. After cross-validating the model using a 75/25 train/test split and utlizing 16 of the top 30 predicting variables, the respective achievable accuracy, sensitivity, and specificity was found 80%, 84%, and 61%.
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+employeeDataForPrediction = employeeData |>
+  select(-ID, -EmployeeCount, -EmployeeNumber, -Over18, -StandardHours)
 
+set.seed(1234)
+evaluateModel = function() {
+  l = length(employeeDataForPrediction$Attrition)
+  indicies = sample(seq(1:l), round(0.75*l))
+  train = employeeDataForPrediction[indicies,]
+  test = employeeDataForPrediction[-indicies,]
+  
+  model = naiveBayes(Attrition ~ JobRole + StockOptionLevel + OverTime + TotalWorkingYears + YearsAtCompany + MonthlyIncome + JobLevel + Age + MaritalStatus + JobInvolvement + YearsInCurrentRole + NumCompaniesWorked + YearsWithCurrManager + PercentSalaryHike + WorkLifeBalance + JobSatisfaction, train)
+  predictions = predict(model, select(test, JobRole, StockOptionLevel, OverTime, TotalWorkingYears, YearsAtCompany, MonthlyIncome, JobLevel, Age, MaritalStatus, JobInvolvement, YearsInCurrentRole, NumCompaniesWorked, YearsWithCurrManager, PercentSalaryHike, WorkLifeBalance, JobSatisfaction))
+    
+  results = confusionMatrix(table(predictions, test$Attrition))
+  acc = as.numeric(results$overall[1])
+  sen = sensitivity(table(predictions, test$Attrition))
+  spc = specificity(table(predictions, test$Attrition))
+  
+  return(tibble("Accuracy" = c(acc), "Sensitivity" = c(sen), "Specificity " = c(spc)))
+}
+
+results = tibble("Accuracy" = c(NULL), "Sensitivity" = c(NULL), "Specificity " = c(NULL))
+for (variable in 1:200) {
+  results = rbind(results, evaluateModel())
+}
+
+results |>
+  pivot_longer(cols = everything(), names_to = "Variable", values_to = "Value") |>
+  ggplot(aes(x = Variable, y = Value)) +
+  geom_boxplot()
+```
+
+To predict salaries, a linear regression model was used
+```{r}
+#| echo: true
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+
+```
 
 
 
